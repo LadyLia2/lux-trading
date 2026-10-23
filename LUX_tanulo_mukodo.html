@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUX — tanuló mód</title>
+<style>
+:root{--pink:#b64d7c;--pale:#f9eaf1;--ink:#29232a;--muted:#766d75;--line:#eadde4;--bg:#fffafd}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#fffafd,#f8edf3);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);padding:18px}
+main{max-width:850px;margin:auto}.brand{letter-spacing:.22em;color:var(--pink);font-weight:800;font-size:30px}.sub{letter-spacing:.18em;font-size:10px;color:var(--muted);margin-top:3px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.pill{border:1px solid var(--line);border-radius:20px;padding:9px 12px;color:var(--pink);font-size:11px;letter-spacing:.08em}
+h1{font-size:23px;margin:12px 0 6px}p{line-height:1.5}.muted{color:var(--muted);font-size:14px}
+.card{background:#ffffffd9;border:1px solid var(--line);border-radius:22px;padding:18px;margin:13px 0;box-shadow:0 6px 25px #8d42650a}
+label{display:block;font-size:11px;letter-spacing:.13em;color:var(--muted);margin-bottom:8px}
+select,button{font:inherit;border-radius:13px;padding:13px;border:1px solid var(--line);background:white;color:var(--ink)}
+button{cursor:pointer;font-weight:650}.primary{background:var(--pink);border-color:var(--pink);color:white;width:100%;margin-top:10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{font-size:25px;font-weight:750}.eyebrow{font-size:11px;letter-spacing:.12em;color:var(--muted);margin-bottom:7px}
+.signal{font-size:24px;font-weight:800;color:var(--pink)}.note{font-size:12px;color:var(--muted)}.good{color:#27835f}.bad{color:#b24d5c}
+ul{padding-left:20px}.chart{height:135px;display:flex;align-items:end;gap:5px;padding:10px 0 0;border-bottom:1px solid var(--line)}.bar{flex:1;border-radius:5px 5px 0 0;background:linear-gradient(#e7a7c5,#b64d7c);min-width:4px}
+@media(max-width:520px){body{padding:12px}.row{grid-template-columns:1fr}.card{padding:15px}header{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body><main>
+<header><div><div class="brand">LUX</div><div class="sub">TRADING SIGNALS · LEARN BEFORE YOU TRADE</div></div><div class="pill">TANULÓ MÓD · VIRTUÁLIS</div></header>
+<h1>Szia! 💗</h1><p class="muted">Ez a változat internet és külső adatforrás nélkül is működik, hogy biztonságosan gyakorolhass.</p>
+<div class="card">
+<label for="market">PIAC KIVÁLASZTÁSA</label>
+<select id="market" style="width:100%"><option value="EUR/USD">EUR/USD · Forex (bemutatóadat)</option><option value="BTC/USD">BTC/USD · Kripto (bemutatóadat)</option><option value="AAPL">AAPL · Részvény (bemutatóadat)</option></select>
+<button class="primary" id="load">Bemutatóadatok betöltése</button>
+<p id="status" class="note">Még nincs betöltve adat.</p>
+<div class="row"><div><div class="eyebrow" id="marketLabel">EUR/USD</div><div class="stat" id="price">—</div><div class="note">Kizárólag kitalált, oktatási célú ár</div></div><div><div class="eyebrow">LUX JELZÉS</div><div class="signal" id="signal">VÁRAKOZÁS</div><div class="note" id="reason">Tölts be bemutatóadatokat.</div></div></div>
+<div class="chart" id="chart" aria-label="Bemutató árfolyamdiagram"></div>
+</div>
+<div class="row"><div class="card"><div class="eyebrow">VIRTUÁLIS EGYENLEG</div><div class="stat" id="balance">100 000 USD</div><div class="note">Csak szimuláció; valódi pénz nincs benne.</div></div><div class="card"><div class="eyebrow">BETÖLTÖTT PONTOK</div><div class="stat" id="points">0</div><div class="note">Kitalált bemutatóadatok</div></div></div>
+<div class="card"><div class="eyebrow">TANULÁSI NAPLÓ</div><ul id="journal"><li>Még nincs bejegyzés.</li></ul><button id="clear" style="width:100%">Napló törlése</button></div>
+<div class="card"><b>Fontos tudnivaló</b><p class="muted">Ez a verzió nem csatlakozik élő piachoz, és a jelzései kizárólag kitalált adatokból készülnek. A „VÉTEL” vagy „ELADÁS” itt nem valódi kereskedési tanács. Élő adatokhoz később megbízható adatforrás és biztonságos háttérrendszer szükséges.</p></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const samples={
+"EUR/USD":[1.081,1.083,1.082,1.085,1.084,1.087,1.086,1.089,1.088,1.091,1.090,1.092,1.094,1.093,1.096,1.098,1.097,1.100,1.101,1.103,1.102,1.105,1.107,1.106],
+"BTC/USD":[64200,64400,64150,64800,64600,65000,65300,65100,65700,65900,65600,66100,66400,66200,66800,67100,66900,67500,67700,67400,68100,68400,68200,68800],
+"AAPL":[218,218.5,217.8,219,219.4,220.1,219.7,221,220.8,221.5,222,221.7,222.4,223,222.8,223.5,224,223.8,224.5,225,224.7,225.4,226,226.3]
+};
+function analyze(){
+ const name=$('market').value, vals=samples[name];$('marketLabel').textContent=name+' · BEMUTATÓ';
+ const p=vals[vals.length-1];$('price').textContent=name==='EUR/USD'?p.toFixed(4):p.toLocaleString('en-US',{maximumFractionDigits:2});
+ const short=vals.slice(-5).reduce((a,b)=>a+b,0)/5,long=vals.slice(-12).reduce((a,b)=>a+b,0)/12;
+ let s='VÁRAKOZÁS',r='A rövid és hosszabb átlag közel van egymáshoz.';
+ if(short>long*1.001){s='EMELKEDŐ';r='A bemutatóadatok rövid átlaga magasabb. Ez nem vételi javaslat.'}
+ else if(short<long*.999){s='CSÖKKENŐ';r='A bemutatóadatok rövid átlaga alacsonyabb. Ez nem eladási javaslat.'}
+ $('signal').textContent=s;$('reason').textContent=r;$('points').textContent=vals.length;
+ $('status').textContent='Sikeres betöltés — OFFLINE BEMUTATÓADATOK, nem élő árfolyam.';
+ const mn=Math.min(...vals),mx=Math.max(...vals),chart=$('chart');chart.innerHTML='';
+ vals.forEach(v=>{const b=document.createElement('div');b.className='bar';b.style.height=(15+(v-mn)/(mx-mn||1)*85)+'%';chart.appendChild(b)});
+ const li=document.createElement('li');li.textContent=new Date().toLocaleTimeString('hu-HU')+' · '+name+' · '+s+' (bemutatóadat)';const j=$('journal');if(j.children.length===1&&j.children[0].textContent==='Még nincs bejegyzés.')j.innerHTML='';j.prepend(li);
+}
+$('load').addEventListener('click',analyze);$('market').addEventListener('change',()=>{$('status').textContent='Nyomd meg a „Bemutatóadatok betöltése” gombot.';$('signal').textContent='VÁRAKOZÁS';$('price').textContent='—';$('chart').innerHTML='';});
+$('clear').addEventListener('click',()=>{$('journal').innerHTML='<li>Még nincs bejegyzés.</li>'});
+</script></body></html>
